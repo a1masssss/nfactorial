@@ -30,7 +30,7 @@ OPEN_API_KEY = os.getenv('OPEN_API_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 

@@ -72,7 +72,7 @@ def locker_view(request):
         'outfit': 'outfits.csv',     
         'emote': 'updated_emotes.csv',        
         'pickaxe': 'updated_pickaxes.csv',     
-        'backpack': 'backpack.csv',   
+        'backpack': 'backpack.csv',
         'glider': 'gliders.csv'        
     }
     
