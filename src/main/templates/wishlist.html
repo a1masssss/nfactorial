@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="locker-cats-wrap">
+  <h2 class="section-title">Your Wishlist Items</h2>
+
+  <!-- Category filters -->
+  <div class="locker-cats" id="game-br">
+    <a href="?category=all" class="cat-link {% if not category or category == 'all' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if not category or category == 'all' %}active{% endif %}" data-filter="all">
+        <div class="locker-cat-icon icon-set"></div>
+        <div class="locker-cat-name">All Items</div>
+      </div>
+    </a>
+    <a href="?category=outfit" class="cat-link {% if category == 'outfit' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if category == 'outfit' %}active{% endif %}" data-filter="outfit">
+        <div class="locker-cat-icon icon-outfit"></div>
+        <div class="locker-cat-name">Outfits</div>
+      </div>
+    </a>
+    <a href="?category=emote" class="cat-link {% if category == 'emote' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if category == 'emote' %}active{% endif %}" data-filter="emote">
+        <div class="locker-cat-icon icon-emote"></div>
+        <div class="locker-cat-name">Emotes</div>
+      </div>
+    </a>
+    <a href="?category=pickaxe" class="cat-link {% if category == 'pickaxe' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if category == 'pickaxe' %}active{% endif %}" data-filter="pickaxe">
+        <div class="locker-cat-icon icon-pickaxe"></div>
+        <div class="locker-cat-name">Pickaxes</div>
+      </div>
+    </a>
+    <a href="?category=backpack" class="cat-link {% if category == 'backpack' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if category == 'backpack' %}active{% endif %}" data-filter="backpack">
+        <div class="locker-cat-icon icon-backpack"></div>
+        <div class="locker-cat-name">BackBlings</div>
+      </div>
+    </a>
+    <a href="?category=glider" class="cat-link {% if category == 'glider' %}active{% endif %}">
+      <div class="locker-cat filter-btn {% if category == 'glider' %}active{% endif %}" data-filter="glider">
+        <div class="locker-cat-icon icon-glider"></div>
+        <div class="locker-cat-name">Gliders</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search wishlist items...">
+  </div>
+
+  <div class="locker-container">
+    {% for item in locker_items %}
+      <div class="item-card" data-name="{{ item.name|lower }}">
+        <a href="{{ item.video_url }}" target="_blank" class="item-link">
+          <div class="card-image-container">
+            <div class="card-image" 
+                style="background-image: url('{{ item.image_url }}');"
+                data-original="{{ item.image_url }}"
+                data-fallback="https://placehold.co/150x150/114a5a/FFF?text={{ item.name|urlencode }}"></div>
+          </div>
+          <div class="card-name">{{ item.name }}</div>
+        </a>
+        <div class="item-actions">
+          <a href="{% url 'delete-wishlist-item' item.id %}?category={{ category }}" class="delete-btn">
+            <i class="fas fa-trash-alt"></i> 
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-wishlist">
+        <p>Your wishlist is empty. Browse the <a href="{% url 'cosmetics' %}">cosmetics</a> to add items!</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .locker-cats-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+  }
+
+  .locker-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .cat-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .locker-cat {
+    width: 120px;
+    height: 120px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  .locker-cat:hover {
+    background: #e0e0e0;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  .locker-cat.active {
+    background: #4287f5;
+    color: white;
+  }
+  
+  .locker-cat-icon {
+    width: 48px;
+    height: 48px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 10px;
+  }
+  
+  .locker-cat-name {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .search-container {
+    margin-bottom: 20px;
+  }
+  
+  #search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+  }
+  
+  .locker-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .item-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  
+  .item-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    flex-grow: 1;
+  }
+  
+  .card-image-container {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    padding: 10px;
+  }
+  
+  .card-image {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  .card-name {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+    background: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .item-type {
+    padding: 5px 10px;
+    font-size: 12px;
+    text-align: center;
+    color: #555;
+    background: #f5f5f5;
+    border-top: 1px solid #eee;
+  }
+  
+  .empty-wishlist {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .empty-wishlist p {
+    margin: 0;
+    font-size: 16px;
+    color: #555;
+  }
+  
+  .empty-wishlist a {
+    color: #4287f5;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .icon-set { 
+      background-image: url("{% static 'icons/all_br.svg' %}");
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  .icon-outfit { 
+      background-image: url("{% static 'icons/outfits.svg' %}"); 
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  .icon-emote { 
+      background-image: url("{% static 'icons/emote.svg' %}"); 
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  .icon-pickaxe { 
+      background-image: url("{% static 'icons/pickaxes.svg' %}");
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  .icon-backpack { 
+      background-image: url("{% static 'icons/backpack.svg' %}"); 
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  .icon-glider { 
+      background-image: url("{% static 'icons/glider.svg' %}"); 
+      filter: invert(1) grayscale(1) brightness(2.2);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .locker-container {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .locker-cat {
+      width: 100px;
+      height: 100px;
+    }
+  }
+  
+  .item-actions {
+    padding: 8px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    background-color: #f9f9f9;
+  }
+  
+  .delete-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #ff4b4b;
+    color: white;;
+  }
+  
+  .delete-btn:hover {
+    background-color: #e03838;
+    color: white;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load images
+    const cardImages = document.querySelectorAll('.card-image');
+    
+    cardImages.forEach(function(imgDiv) {
+      const originalUrl = imgDiv.getAttribute('data-original');
+      const fallbackUrl = imgDiv.getAttribute('data-fallback');
+      
+      // Try to load the original image
+      const img = new Image();
+      img.onload = function() {
+        // If load successful, set the original image
+        imgDiv.style.backgroundImage = `url('${originalUrl}')`;
+      };
+      
+      img.onerror = function() {
+        // If load fails, use the fallback image
+        imgDiv.style.backgroundImage = `url('${fallbackUrl}')`;
+        console.log('Failed to load image:', originalUrl);
+      };
+      
+      img.src = originalUrl;
+    });
+    
+    // Search functionality
+    const searchInput = document.getElementById('search-input');
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      itemCards.forEach(function(card) {
+        const cardName = card.getAttribute('data-name');
+        if (cardName.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+

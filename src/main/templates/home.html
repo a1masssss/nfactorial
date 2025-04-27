@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Hero Section with Parallax Effect -->
+    <div class="position-relative overflow-hidden rounded shadow mb-5" style="height: 500px;">
+        <div class="parallax-bg" style="background-image: url('https://cdn2.unrealengine.com/br-hero-1920x700-7014a996bc66.png'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover; height: 100%; width: 100%;"></div>
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white" style="background-color: rgba(0,0,0,0.5);">
+            <h1 class="display-2 fw-bold text-shadow">🎮 FORTNITE UNIVERSE 🛡️</h1>
+            <p class="lead fs-3 mt-3 text-shadow">Ready for an adventure? Dive into the world of your favorite heroes!</p>
+        </div>
+    </div>
+
+
+    <!-- Call to Action with Animation -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="cta-container p-5 rounded shadow-lg" style="background: linear-gradient(135deg, #5643CC 0%, #00AEFF 100%);">
+                <h2 class="text-white mb-4">READY TO HOT DROP?</h2>
+                {% if user.is_authenticated %}
+                    <div class="btn">
+                        <a href="{% url 'chat' %}" class="btn btn-lg btn-light ">CHAT WITH YOUR HERO</a>
+                    </div>
+                {% else %}
+                <div class="btn">
+                    <a href="{% url 'login' %}" class="btn btn-lg btn-light ">CHAT WITH YOUR HERO</a>
+                </div>
+                {% endif %}
+                    
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interactive Character Selection -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-4">
+            <h2 class="display-5">SELECT YOUR HERO</h2>
+            <p class="lead">Choose your champion to begin the adventure</p>
+        </div>
+        
+        <div class="character-carousel d-flex justify-content-center mb-4">
+            <div class="character-card mx-2" onclick="selectCharacter('drift')">
+                <div class="card shadow-lg hover-card" style="width: 200px;">
+                    <img src="https://preview.redd.it/99568bdkjio71.jpg?width=875&format=pjpg&auto=webp&s=7efb786fff29f3c4d24f8a8b420e42458e08e532" alt="Drift" class="card-img-top">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Drift</h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="character-card mx-2" onclick="selectCharacter('midas')">
+                <div class="card shadow-lg hover-card" style="width: 200px;">
+                    <img src="https://i.pinimg.com/736x/b6/52/5c/b6525c3eeb205729b7ce43c65e8e1341.jpg" alt="Midas" class="card-img-top">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Midas</h5>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="character-card mx-2" onclick="selectCharacter('peely')">
+                <div class="card shadow-lg hover-card" style="width: 200px;">
+                    <img src="https://i.pinimg.com/736x/f7/58/83/f75883b755c247204b0a079b4d4bd503.jpg" alt="Peely" class="card-img-top">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Peely</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="characterInfo" class="col-12 text-center d-none">
+            <div class="alert alert-primary p-4 shadow">
+                <h3 id="characterName">Character Name</h3>
+                <p id="characterDescription">Character description will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    
+    
+</div>
+
+<style>
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+    
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+        cursor: pointer;
+    }
+    
+    .game-mode-card {
+        border-radius: 10px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    
+    .news-card {
+        transition: transform 0.3s ease;
+    }
+    
+    .news-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .parallax-bg {
+        transform: translateZ(-1px) scale(1.5);
+    }
+</style>
+
+<!-- Custom JavaScript -->
+<script>
+    function selectCharacter(character) {
+        const characterInfo = document.getElementById('characterInfo');
+        const characterName = document.getElementById('characterName');
+        const characterDescription = document.getElementById('characterDescription');
+        
+        characterInfo.classList.remove('d-none');
+        
+        switch(character) {
+            case 'drift':
+                characterName.textContent = 'Drift';
+                characterDescription.textContent = 'A mysterious character pulled from our world into Fortnite through the Rift. Known for his kitsune mask and electric powers.';
+                break;
+            case 'midas':
+                characterName.textContent = 'Midas';
+                characterDescription.textContent = 'The golden-touched mastermind and leader of GHOST. Everything he touches turns to gold.';
+                break;
+            case 'peely':
+                characterName.textContent = 'Peely';
+                characterDescription.textContent = 'A sentient banana who brings humor and fun to the battlefield. Always ready for a slippery situation!';
+                break;
+        }
+        
+        // Add selection effect
+        const cards = document.querySelectorAll('.character-card .card');
+        cards.forEach(card => card.style.border = 'none');
+        
+        const selectedCard = document.querySelector(`.character-card[onclick="selectCharacter('${character}')"] .card`);
+        selectedCard.style.border = '3px solid #00AEFF';
+    }
+    
+    function selectMode(mode) {
+        const cards = document.querySelectorAll('.game-mode-card');
+        cards.forEach(card => card.style.border = 'none');
+        
+        const selectedCard = document.querySelector(`.game-mode-card[onclick="selectMode('${mode}')"]`);
+        selectedCard.style.border = '3px solid #00AEFF';
+        
+        // You can add more functionality here like changing content based on selected mode
+    }
+    
+    // Add subtle parallax effect on mouse move
+    document.addEventListener('mousemove', function(e) {
+        const parallaxElements = document.querySelectorAll('.parallax-bg');
+        const mouseX = (e.clientX / window.innerWidth) - 0.5;
+        const mouseY = (e.clientY / window.innerHeight) - 0.5;
+        
+        parallaxElements.forEach(element => {
+            element.style.transform = `translateX(${mouseX * 20}px) translateY(${mouseY * 20}px) translateZ(-1px) scale(1.5)`;
+        });
+    });
+</script>
+{% endblock %}

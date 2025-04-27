@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">🛡️ Talk to a Fortnite Character</h1>
+
+  <div id="chat" style="border: 1px solid #555; padding: 10px; height: 300px; overflow-y: scroll; background: #222; margin-bottom: 10px; color: white;"></div>
+
+
+  <div class="row g-3 align-items-center">
+    <div class="col-md-4">
+      <select id="character" class="form-select">
+        {% if outfits %}
+          {% for outfit in outfits %}
+            <option value="{{ outfit.name }}">{{ outfit.name }}</option>
+          {% endfor %}
+        {% else %}
+          <option value="Peely">Peely</option>
+          <option value="Jonesy">Jonesy</option>
+          <option value="Midas">Midas</option>
+          <option value="Renegade Raider">Renegade Raider</option>
+        {% endif %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <input type="text" id="message" class="form-control" placeholder="Say something..." />
+    </div>
+    <div class="col-md-2">
+      <button onclick="sendMessage()" class="btn btn-primary w-100">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const chatBox = document.getElementById("chat");
+  
+  function addMessage(sender, text) {
+    const msg = document.createElement("div");
+    msg.className = sender;
+    
+    if (sender === "user") {
+      msg.textContent = `You: ${text}`;
+    } else {
+
+      const prefix = document.createElement("span");
+      prefix.textContent = "Bot: ";
+      msg.appendChild(prefix);
+      
+      const content = document.createElement("span");
+      content.className = "bot-content";
+      msg.appendChild(content);
+      
+      content.textContent = text;
+    }
+    
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function updateBotMessage(text, character) {
+  let botMsg = document.querySelector("#chat .bot:last-child");
+  if (!botMsg) {
+    botMsg = document.createElement("div");
+    botMsg.className = "bot";
+
+    const prefix = document.createElement("span");
+    prefix.className = "bot-prefix";
+    prefix.textContent = `${character}: `;  // имя персонажа
+    botMsg.appendChild(prefix);
+
+    const content = document.createElement("span");
+    content.className = "bot-content";
+    botMsg.appendChild(content);
+
+    chatBox.appendChild(botMsg);
+  }
+
+  const contentSpan = botMsg.querySelector(".bot-content");
+  contentSpan.textContent = text;
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+  function sendMessage() {
+    const input = document.getElementById("message");
+    const character = document.getElementById("character").value;
+    const userText = input.value;
+    if (!userText.trim()) return;
+
+    addMessage("user", userText);
+    input.value = "";
+
+    updateBotMessage("...", character);
+
+    let fullResponse = "";
+
+    fetch("/api/tolc_to_character_stream/?character=" + encodeURIComponent(character) + "&prompt=" + encodeURIComponent(userText))
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        
+        function processText({ done, value }) {
+          if (done) {
+            return;
+          }
+          
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n\n");
+          
+          lines.forEach(line => {
+            if (line.startsWith("data: ")) {
+              const data = line.replace("data: ", "");
+              if (data === "[DONE]") {
+                // Final message received
+                console.log("Stream complete");
+                return;
+              } else {
+                fullResponse += data;
+                updateBotMessage(fullResponse);
+              }
+            }
+          });
+          
+          // Continue reading
+          return reader.read().then(processText);
+        }
+        
+        return reader.read().then(processText);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        updateBotMessage("Error: Failed to get response");
+      });
+  }
+
+</script>
+{% endblock %}
