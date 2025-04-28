@@ -1,4 +1,4 @@
-# NFACORIAL Task - Fortnite Universe
+# NFACTORIAL Task - Fortnite Universe
 
 ## Описание
 Проект для чатинга с любимыми персонажами из фортнай и собери свой шкавчик мечты Fortnite. Данные получены с fortnite.gg, включая скины, эмоции, дельтапланы и кирки.
