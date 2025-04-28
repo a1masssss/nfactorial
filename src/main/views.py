@@ -20,7 +20,8 @@ def home(request):
     return render(request, 'home.html')
 
 def chat_page(request):
-    return render(request, 'chat.html')
+    outfits = UserLockerItem.objects.filter(user = request.user, item_type = 'outfit')
+    return render(request, 'chat.html', {'outfits': outfits})
 
 
 
